@@ -36,7 +36,10 @@ func Run(ui packer.Ui, config *Config) (bool, error) {
 	}
 
 	// Create environment variables to set before executing the command
-	flattenedEnvVars := createFlattenedEnvVars(config)
+	flattenedEnvVars, err := createFlattenedEnvVars(config)
+	if err != nil {
+		return false, err
+	}
 
 	for _, script := range scripts {
 		interpolatedCmds, err := createInterpolatedCommands(config, script, flattenedEnvVars)
@@ -123,8 +126,8 @@ func createInterpolatedCommands(config *Config, script string, flattenedEnvVars 
 	return interpolatedCmds, nil
 }
 
-func createFlattenedEnvVars(config *Config) (flattened string) {
-	flattened = ""
+func createFlattenedEnvVars(config *Config) (string, error) {
+	flattened := ""
 	envVars := make(map[string]string)
 
 	// Always available Packer provided env vars
@@ -147,17 +150,47 @@ func createFlattenedEnvVars(config *Config) (flattened string) {
 	sort.Strings(keys)
 
 	// Re-assemble vars surrounding value with single quotes and flatten
+	envVarFormat := "%s='%s' "
 	if runtime.GOOS == "windows" {
-		log.Printf("MEGAN NEED TO IMPLEMENT")
-		// createEnvVarsSourceFileWindows()
+		// This is designed to work for cmd, not powershell
+		envVarFormat = "set %s=%s & "
+		// envVarFile, err := createEnvVarsFileWindows(envVars, keys)
+		// if err != nil {
+		// 	return "", err
+		// }
 	}
 	for _, key := range keys {
-		flattened += fmt.Sprintf("%s='%s' ", key, envVars[key])
+		flattened += fmt.Sprintf(envVarFormat, key, envVars[key])
 	}
-	return
+	return flattened, nil
 }
 
-// func createFlattenedEnvVarsWindows(
-// // The default shell, cmd, can set vars via dot sourcing
-// // set TESTXYZ=XYZ
-// )
+// func createEnvVarsFileWindows(envVars map[string]string, keys []string) (string, error) {
+// 	// The default shell, cmd, can set vars via dot sourcing
+// 	// set TESTXYZ=XYZ
+// 	tf, err := ioutil.TempFile("", "packer-shell")
+// 	if err != nil {
+// 		return "", fmt.Errorf("Error preparing env var file: %s", err)
+// 	}
+
+// 	// Write our contents to it
+// 	writer := bufio.NewWriter(tf)
+
+// 	for _, key := range keys {
+// 		_, err := writer.WriteString(fmt.Sprintf("set %s=%s; ", key, envVars[key]))
+// 		if err != nil {
+// 			return "", fmt.Errorf("Error preparing env var file: %s", err)
+// 		}
+// 	}
+
+// 	if err := writer.Flush(); err != nil {
+// 		return "", fmt.Errorf("Error preparing env var file: %s", err)
+// 	}
+
+// 	tf.Close()
+// 	err = os.Chmod(tf.Name(), 0555)
+// 	if err != nil {
+// 		log.Printf("error modifying permissions of env var file: %s", err.Error())
+// 	}
+// 	return tf.Name(), nil
+// }
