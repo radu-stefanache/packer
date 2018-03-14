@@ -28,6 +28,10 @@ The Docker builder must run on a machine that has Docker installed. Therefore
 the builder only works on machines that support Docker. You can learn about
 what [platforms Docker supports and how to install onto them](https://docs.docker.com/engine/installation/) in the Docker documentation.
 
+
+     Please note: Packer does not yet have support for Windows containers.
+
+
 ## Basic Example: Export
 
 Below is a fully functioning example. It doesn't do anything useful, since no
