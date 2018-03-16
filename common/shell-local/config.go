@@ -155,15 +155,17 @@ func Validate(config *Config) error {
 			}
 			config.Scripts[index] = converted
 		}
-		// Interoperability issues with WSL makes creating and running tempfiles
-		// via golang's os package basically impossible.
+	}
+	if runtime.GOOS == "windows" {
 		if len(config.Inline) > 0 {
 			errs = packer.MultiErrorAppend(errs,
-				fmt.Errorf("Packer is unable to use the Command and Inline "+
-					"features with the Windows Linux Subsystem. Please use "+
-					"the Script or Scripts options instead"))
+				fmt.Errorf("Packer is currently unable to use the Command "+
+					"and Inline features of the shell-local provisioner and "+
+					"post-processor with Windows. Please use the Script or "+
+					"Scripts options instead."))
 		}
 	}
+
 	// This is currently undocumented and not a feature users are expected to
 	// interact with.
 	if config.EnvVarFormat == "" {
