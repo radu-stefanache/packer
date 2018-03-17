@@ -17,8 +17,6 @@ import (
 type Config struct {
 	common.PackerConfig `mapstructure:",squash"`
 
-	// ** DEPRECATED: USE INLINE INSTEAD **
-	// ** Only Present for backwards compatibiltiy **
 	// Command is the command to execute
 	Command string
 
@@ -76,8 +74,10 @@ func Validate(config *Config) error {
 		if len(config.ExecuteCommand) == 0 {
 			config.ExecuteCommand = []string{
 				"cmd",
+				"/V",
 				"/C",
 				"{{.Vars}}",
+				"call",
 				"{{.Script}}",
 			}
 		}
@@ -170,7 +170,7 @@ func Validate(config *Config) error {
 	// interact with.
 	if config.EnvVarFormat == "" {
 		if (runtime.GOOS == "windows") && !config.UseLinuxPathing {
-			config.EnvVarFormat = `set "%s=%s" && `
+			config.EnvVarFormat = "set %s=%s & "
 		} else {
 			config.EnvVarFormat = "%s='%s' "
 		}

@@ -104,7 +104,9 @@ Optional parameters:
    the example below for more guidance on how to use this feature. If you are
    not on a Windows host, or you do not intend to use the shell-local
    post-processor to run a bash script, please ignore this option. This feature
-   is still in beta, as the underlying WSL is also still in beta.
+   is still in beta, as the underlying WSL is also still in beta. For example,
+   It will likely not work unless both Packer and the scripts you want to run
+   are both on the C drive.
 
 ## Execute Command
 
@@ -129,7 +131,8 @@ available to you; please limit yourself to using the "script" or "scripts"
 options instead.
 
 Please note that the WSL is a beta feature, and this tool is not guaranteed to
-work as you expect it to.
+work as you expect it to. It will likely not work unless both Packer and the
+scripts you want to run are both on the C drive.
 
 ```
 {

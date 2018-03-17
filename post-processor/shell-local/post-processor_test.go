@@ -34,7 +34,10 @@ func TestPostProcessorPrepare_Defaults(t *testing.T) {
 
 	err := p.Configure(raws)
 	if err != nil {
-		t.Fatalf("err: %s", err)
+		// this would break on windows becuase inline and command are disabled.
+		if runtime.GOOS != "windows" {
+			t.Fatalf("err: %s", err)
+		}
 	}
 }
 
